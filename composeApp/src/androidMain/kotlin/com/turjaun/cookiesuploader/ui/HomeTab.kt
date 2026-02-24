@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,8 +47,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformationimport androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.KeyboardTypeimport androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -95,8 +96,8 @@ fun HomeTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                     Text("Convert & upload cookies", color = AppColors.textSecondary, fontSize = 12.sp)
                 }
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = when (serverStatus) {                        "ON" -> AppColors.success.copy(alpha = 0.15f)
+                    shape = RoundedCornerShape(16.dp),                    color = when (serverStatus) {
+                        "ON" -> AppColors.success.copy(alpha = 0.15f)
                         "OFF" -> AppColors.error.copy(alpha = 0.15f)
                         else -> AppColors.surface
                     },
@@ -144,14 +145,14 @@ fun HomeTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                         )
                         if (isChecking) {
                             Spacer(modifier = Modifier.width(6.dp))
-                            CircularProgressIndicator(modifier = Modifier.size(12.dp), color = AppColors.primary, strokeWidth = 1.5.dp)
-                        }                    }
+                            CircularProgressIndicator(modifier = Modifier.size(12.dp), color = AppColors.primary, strokeWidth = 1.5.dp)                        }
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Username Input
+            // Username
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
@@ -171,7 +172,7 @@ fun HomeTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Password Input
+            // Password
             Text("Password", color = AppColors.textSecondary, fontSize = 11.sp, modifier = Modifier.padding(bottom = 4.dp, start = 4.dp))
             OutlinedTextField(
                 value = password,
@@ -193,8 +194,8 @@ fun HomeTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                             imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                             contentDescription = null,
                             tint = AppColors.textSecondary
-                        )
-                    }                },
+                        )                    }
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
@@ -204,7 +205,7 @@ fun HomeTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Cookies Input
+            // Cookies
             OutlinedTextField(
                 value = cookies,
                 onValueChange = { cookies = it },
@@ -225,7 +226,7 @@ fun HomeTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Action Buttons
+            // Buttons
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Button(
                     onClick = { username = ""; cookies = "" },
@@ -242,20 +243,19 @@ fun HomeTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                     },
                     modifier = Modifier.weight(2f),
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.success, contentColor = Color.Black),
-                    shape = RoundedCornerShape(10.dp),
-                    enabled = username.isNotBlank() && cookies.isNotBlank()                ) { Text("Convert & Push", fontWeight = FontWeight.Bold, fontSize = 13.sp) }
+                    shape = RoundedCornerShape(10.dp),                    enabled = username.isNotBlank() && cookies.isNotBlank()
+                ) { Text("Convert & Push", fontWeight = FontWeight.Bold, fontSize = 13.sp) }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Logs Section
+            // Logs
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text("Activity Log", color = AppColors.textPrimary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 if (logs.isNotEmpty()) TextButton(onClick = { viewModel.clearLogs() }) { Text("Clear", color = AppColors.error, fontSize = 11.sp) }
             }
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Logs List
             Surface(
                 modifier = Modifier.fillMaxWidth().weight(1f),
                 color = AppColors.surface,
@@ -266,7 +266,7 @@ fun HomeTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                         Text("No activity yet", color = AppColors.textSecondary, fontSize = 12.sp)
                     }
                 } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(10.dp)) {
+                    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
                         items(logs) { log -> LogItemSimple(log) }
                     }
                 }

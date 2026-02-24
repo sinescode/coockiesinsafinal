@@ -50,7 +50,6 @@ class FileHelper(private val context: Context) {
             
             if (file.canWrite() || Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 FileOutputStream(file).use { fos -> fos.write(content.toByteArray(Charsets.UTF_8)) }
-                // ✅ FIXED: Use FileProvider.getUriForFile
                 FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
             } else {
                 writeViaMediaStore(filename, content)

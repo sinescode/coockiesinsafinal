@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Visibility
@@ -46,8 +47,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Colorimport androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Brushimport androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -95,8 +96,8 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                     modifier = Modifier.fillMaxWidth(),
                     colors = simpleTextFieldColors(),
                     shape = RoundedCornerShape(12.dp), singleLine = true
-                )
-            }            
+                )            }
+            
             Spacer(modifier = Modifier.height(16.dp))
             
             // Filename Card
@@ -144,8 +145,8 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Button(
                                     onClick = {
-                                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                        val clip = ClipData.newPlainText("FCM Token", fcmToken)                                        clipboard.setPrimaryClip(clip)
+                                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager                                        val clip = ClipData.newPlainText("FCM Token", fcmToken)
+                                        clipboard.setPrimaryClip(clip)
                                         Toast.makeText(context, "Token copied!", Toast.LENGTH_SHORT).show()
                                     },
                                     modifier = Modifier.align(Alignment.End),
@@ -185,7 +186,7 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 Surface(
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp).clip(RoundedCornerShape(10.dp)),
                     color = AppColors.success.copy(alpha = 0.15f),
-                    border = androidx.compose.ui.Modifier.border(width = 1.dp, color = AppColors.success.copy(alpha = 0.5f), shape = RoundedCornerShape(10.dp))
+                    border = Modifier.border(width = 1.dp, color = AppColors.success.copy(alpha = 0.5f), shape = RoundedCornerShape(10.dp))
                 ) {
                     Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Check, contentDescription = "Success", tint = AppColors.success, modifier = Modifier.padding(end = 8.dp))
@@ -193,8 +194,8 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                     }
                 }
                 LaunchedEffect(Unit) { kotlinx.coroutines.delay(2500); showSavedMessage = false }
-            }
-                        Spacer(modifier = Modifier.height(40.dp))
+            }            
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 }
@@ -205,7 +206,7 @@ fun SettingsCardSimple(title: String, icon: String, isExpanded: Boolean = false,
         modifier = Modifier.fillMaxWidth(),
         color = AppColors.surface.copy(alpha = 0.7f),
         shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.ui.Modifier.border(width = 1.dp, color = AppColors.outline, shape = RoundedCornerShape(16.dp))
+        border = Modifier.border(width = 1.dp, color = AppColors.outline, shape = RoundedCornerShape(16.dp))
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = if (isExpanded) 16.dp else 0.dp)) {

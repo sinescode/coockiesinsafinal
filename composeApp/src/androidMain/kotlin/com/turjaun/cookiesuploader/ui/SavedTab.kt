@@ -104,7 +104,6 @@ fun SavedTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                         Text("Saved Accounts", color = AppColors.textPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Text("${accounts.size} items", color = AppColors.textSecondary, fontSize = 13.sp)
                     }
-                    
                     Row {
                         IconButton(
                             onClick = { viewModel.downloadEncryptedFile() },
@@ -145,8 +144,8 @@ fun SavedTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 targetState = accounts.isEmpty(),
                 label = "EmptyStateToggle",
                 modifier = Modifier.weight(1f)
-            ) { isEmpty ->                if (isEmpty) {
-                    Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+            ) { isEmpty ->
+                if (isEmpty) {                    Box(modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Surface(modifier = Modifier.size(80.dp), color = AppColors.surfaceVariant, shape = CircleShape) {
                                 Box(contentAlignment = Alignment.Center) {
@@ -194,8 +193,8 @@ fun SavedTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 confirmButton = {
                     Button(onClick = { viewModel.clearAccounts(); showDeleteAllDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = AppColors.error), shape = RoundedCornerShape(10.dp)) {
                         Text("Delete All", fontWeight = FontWeight.Medium)
-                    }                },
-                dismissButton = { TextButton(onClick = { showDeleteAllDialog = false }, shape = RoundedCornerShape(10.dp)) { Text("Cancel", color = AppColors.textSecondary) } }
+                    }
+                },                dismissButton = { TextButton(onClick = { showDeleteAllDialog = false }, shape = RoundedCornerShape(10.dp)) { Text("Cancel", color = AppColors.textSecondary) } }
             )
         }
         
@@ -243,8 +242,8 @@ fun AccountCardSimple(account: Account, isDuplicate: Boolean, onDelete: () -> Un
             .border(width = 1.dp, color = cardBorderColor, shape = RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
         color = Color.Transparent
-    ) {        Column(modifier = Modifier.background(cardBackground)) {
-            // Header
+    ) {
+        Column(modifier = Modifier.background(cardBackground)) {            // Header
             Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (isDuplicate) {
@@ -262,7 +261,7 @@ fun AccountCardSimple(account: Account, isDuplicate: Boolean, onDelete: () -> Un
                 }
             }
             
-            // Expandable Details - Simple conditional instead of complex animation
+            // Expandable Details
             if (expanded) {
                 Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).border(width = 1.dp, color = AppColors.outline.copy(alpha = 0.3f), shape = RoundedCornerShape(8.dp)).padding(12.dp)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -292,8 +291,8 @@ fun AccountCardSimple(account: Account, isDuplicate: Boolean, onDelete: () -> Un
         }
     }
     
-    // Delete Confirmation    if (showDeleteDialog) {
-        AlertDialog(
+    // Delete Confirmation
+    if (showDeleteDialog) {        AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             containerColor = AppColors.surface,
             shape = RoundedCornerShape(20.dp),
