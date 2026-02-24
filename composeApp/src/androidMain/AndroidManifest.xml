@@ -45,13 +45,7 @@
         </service>
 
         <!-- FCM Token refresh handler -->
-        <service
-            android:name=".fcm.FcmTokenManager"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-            </intent-filter>
-        </service>
+
 
         <!-- Notification Channel for FCM -->
         <meta-data

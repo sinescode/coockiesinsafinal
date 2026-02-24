@@ -29,6 +29,7 @@ kotlin {
             implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
             implementation("com.google.firebase:firebase-messaging-ktx")
             implementation("com.google.firebase:firebase-analytics-ktx")
+            implementation("androidx.fragment:fragment-ktx:1.6.2")
             
             implementation(libs.androidx.security.crypto)
             implementation(libs.androidx.work.runtime)
