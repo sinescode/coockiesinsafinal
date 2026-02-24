@@ -47,7 +47,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.turjaun.cookiesuploader.data.model.LogEntryimport com.turjaun.cookiesuploader.ui.theme.AppColors
+import com.turjaun.cookiesuploader.data.model.LogEntry
+import com.turjaun.cookiesuploader.ui.theme.AppColors
 
 @Composable
 fun HomeTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
