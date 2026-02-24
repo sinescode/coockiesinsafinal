@@ -5,6 +5,9 @@ import com.turjaun.cookiesuploader.data.model.Account
 import com.turjaun.cookiesuploader.data.model.LogEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -88,13 +91,18 @@ class AccountRepository(private val context: Context) {
         dataStore.saveFcmToken(token)
     }
 
+    // ✅ FIXED: Line 93 - Added explicit type parameter <List<Account>>
     suspend fun exportEncryptedData(password: String): Pair<String, String> {
         val accountsList = accounts.first()
-        val json = kotlinx.serialization.json.Json.encodeToString(accountsList)
+        
+        // ✅ Use reified type for List<Account> serialization
+        val json = Json.encodeToString<List<Account>>(accountsList)
+        
         val encrypted = SecureVault.pack(json, password)
         return password to encrypted
     }
 
+    // ✅ FIXED: Added explicit type parameter for decodeFromString
     suspend fun importEncryptedData(fileContent: String, password: String): Boolean {
         val newlineIdx = fileContent.indexOf('\n')
         val encryptedContent = if (newlineIdx != -1) {
@@ -106,7 +114,8 @@ class AccountRepository(private val context: Context) {
         val decrypted = SecureVault.unpack(encryptedContent, password)
         if (decrypted.startsWith("ERROR:")) return false
 
-        val imported = kotlinx.serialization.json.Json.decodeFromString<List<Account>>(decrypted)
+        // ✅ Use reified type for deserialization
+        val imported = Json.decodeFromString<List<Account>>(decrypted)
         dataStore.saveAccounts(imported)
         return true
     }

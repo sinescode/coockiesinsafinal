@@ -37,6 +37,7 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
+            implementation(libs.kotlinx.serialization.json)
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.materialIconsExtended)
