@@ -1,109 +1,82 @@
 package com.turjaun.cookiesuploader.ui
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.turjaun.cookiesuploader.data.model.Account
 import com.turjaun.cookiesuploader.ui.theme.AppColors
 
 @Composable
-fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val webhookUrl by viewModel.webhookUrl.collectAsState()
-    val jsonFilename by viewModel.jsonFilename.collectAsState()
-    val fcmToken by viewModel.fcmToken.collectAsState()
-    
-    var webhook by remember { mutableStateOf(webhookUrl) }    var filename by remember { mutableStateOf(jsonFilename) }
-    var showSaved by remember { mutableStateOf(false) }
+fun SavedTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+    val accounts by viewModel.accounts.collectAsState(initial = emptyList())
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(webhookUrl) { webhook = webhookUrl }
-    LaunchedEffect(jsonFilename) { filename = jsonFilename }
-
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
             .background(brush = Brush.verticalGradient(colors = listOf(AppColors.background, AppColors.surface)))
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
     ) {
-        Text("Settings", color = AppColors.textPrimary, fontSize = 20.sp)
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Webhook
-        Text("Webhook URL", color = AppColors.textSecondary, fontSize = 12.sp)
-        OutlinedTextField(value = webhook, onValueChange = { webhook = it }, modifier = Modifier.fillMaxWidth(), colors = textFieldColors(), shape = RoundedCornerShape(8.dp))
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        // Filename
-        Text("Filename", color = AppColors.textSecondary, fontSize = 12.sp)
-        OutlinedTextField(value = filename, onValueChange = { filename = it }, modifier = Modifier.fillMaxWidth(), colors = textFieldColors(), shape = RoundedCornerShape(8.dp))
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // FCM Token
-        Text("FCM Token", color = AppColors.textSecondary, fontSize = 12.sp)
-        Surface(modifier = Modifier.fillMaxWidth(), color = AppColors.surface, shape = RoundedCornerShape(8.dp)) {
-            SelectionContainer {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text(if (fcmToken.isNotBlank() && !fcmToken.startsWith("Error")) fcmToken else "Loading...", color = if (fcmToken.isNotBlank()) AppColors.success else AppColors.textSecondary, fontSize = 11.sp)
-                    if (fcmToken.isNotBlank() && !fcmToken.startsWith("Error")) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = {
-                            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            clipboard.setPrimaryClip(ClipData.newPlainText("Token", fcmToken))
-                            Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show()
-                        }, colors = ButtonDefaults.buttonColors(containerColor = AppColors.primary)) {
-                            Icon(Icons.Default.ContentCopy, null, modifier = Modifier.size(16.dp), tint = Color.White)
-                            Spacer(modifier = Modifier.weight(1f))
-                            Text("Copy", color = Color.White)
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text("Saved: ${accounts.size}", color = AppColors.textPrimary, fontSize = 18.sp)
+                Row {
+                    IconButton(onClick = { viewModel.downloadEncryptedFile() }) { Icon(Icons.Default.Download, null, tint = AppColors.success) }
+                    IconButton(onClick = { showDeleteDialog = true }) { Icon(Icons.Default.Delete, null, tint = AppColors.error) }
+                }
+            }
+            if (accounts.isEmpty()) Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("No accounts", color = AppColors.textSecondary) }
+            else LazyColumn(modifier = Modifier.fillMaxSize().weight(1f), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(accounts) { account ->
+                    Surface(modifier = Modifier.fillMaxWidth(), color = AppColors.surface, shape = RoundedCornerShape(8.dp)) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(account.username, color = AppColors.textPrimary, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                            Text("Pass: ${account.password}", color = AppColors.textSecondary, fontSize = 12.sp)
+                            Text("Auth: ${account.authCode.take(30)}${if (account.authCode.length > 30) "..." else ""}", color = AppColors.info, fontSize = 11.sp)
                         }
                     }
                 }
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Save        Button(onClick = { viewModel.saveSettings(webhook, filename); showSaved = true }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = AppColors.primary), shape = RoundedCornerShape(8.dp)) { Text("Save Settings") }
-        if (showSaved) { Text("Saved!", color = AppColors.success, modifier = Modifier.padding(top = 8.dp)); LaunchedEffect(Unit) { kotlinx.coroutines.delay(2000); showSaved = false } }
+        if (showDeleteDialog) AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            containerColor = AppColors.surface,
+            title = { Text("Delete All?", color = AppColors.textPrimary) },
+            text = { Text("Remove all saved accounts?", color = AppColors.textSecondary) },
+            confirmButton = { Button(onClick = { viewModel.clearAccounts(); showDeleteDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = AppColors.error)) { Text("Delete") } },
+            dismissButton = { TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") } }
+        )
     }
 }
-
-@Composable
-fun textFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedTextColor = AppColors.textPrimary, unfocusedTextColor = AppColors.textPrimary,
-    focusedContainerColor = AppColors.surface, unfocusedContainerColor = AppColors.surface,
-    focusedBorderColor = AppColors.primary, unfocusedBorderColor = AppColors.outline
-)

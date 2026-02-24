@@ -10,10 +10,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.core.content.ContextCompat
 import com.turjaun.cookiesuploader.ui.MainScreen
-import com.turjaun.cookiesuploader.ui.theme.AppColors
 
 class MainActivity : ComponentActivity() {
     
@@ -27,7 +25,6 @@ class MainActivity : ComponentActivity() {
         askNotificationPermission()
         
         setContent {
-            // ✅ Use MaterialTheme with AppColors directly
             MaterialTheme {
                 Surface {
                     MainScreen()
