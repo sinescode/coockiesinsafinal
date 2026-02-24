@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)  // Add this
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.googleServices)
 }
@@ -24,7 +25,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.datastore.preferences)
             
-            // Firebase - use BOM correctly
+            // Firebase
             implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
             implementation("com.google.firebase:firebase-messaging-ktx")
             implementation("com.google.firebase:firebase-analytics-ktx")
