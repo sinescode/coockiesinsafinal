@@ -114,8 +114,8 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                     .padding(end = 8.dp)
             ) {
                 Text(
-                    text = fcmToken.ifEmpty { "Generating token..." },
-                    color = if (fcmToken.isEmpty()) Color(0xFF64748b) else Color(0xFF22c55e),
+                    text = if (fcmToken.isNotEmpty()) fcmToken else "Generating token...",
+                    color = if (fcmToken.isNotEmpty()) Color(0xFF22c55e) else Color(0xFF64748b),
                     fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace,
                     maxLines = 2,
@@ -143,7 +143,7 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                 )
             ) {
                 Icon(
-                    imageVector = Icons.Default.ContentCopy,
+                    imageVector = Icons.Filled.ContentCopy,
                     contentDescription = "Copy",
                     tint = Color.White,
                     modifier = Modifier.padding(end = 4.dp)
