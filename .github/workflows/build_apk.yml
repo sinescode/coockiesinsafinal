@@ -22,6 +22,15 @@ jobs:
         distribution: 'temurin'
         cache: gradle
     
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+    
+    - name: Create local.properties with SDK path
+      run: |
+        echo "sdk.dir=${ANDROID_HOME}" > composeApp/local.properties
+        echo "Created local.properties:"
+        cat composeApp/local.properties
+    
     - name: Decode google-services.json
       env:
         GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
@@ -30,16 +39,17 @@ jobs:
           echo "Error: GOOGLE_SERVICES_JSON secret is not set!"
           exit 1
         fi
-        # Create in the main source set where plugin expects it
         echo "$GOOGLE_SERVICES_JSON" | base64 -di > composeApp/google-services.json
-        echo "google-services.json created successfully"
-        ls -la composeApp/google-services.json
+        echo "✓ google-services.json created"
     
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     
     - name: Build Debug APK
-      run: ./gradlew :composeApp:assembleDebug --no-daemon
+      run: ./gradlew :composeApp:assembleDebug --no-daemon --stacktrace
+      env:
+        ANDROID_HOME: ${{ env.ANDROID_HOME }}
+        ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
     
     - name: Build Signed Release APK
       env:
@@ -47,9 +57,11 @@ jobs:
         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        ANDROID_HOME: ${{ env.ANDROID_HOME }}
+        ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
       run: |
         if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
-          echo "Warning: Signing secrets not fully configured. Building unsigned release APK."
+          echo "⚠️ Signing secrets not configured. Building unsigned release APK."
           ./gradlew :composeApp:assembleRelease --no-daemon
         else
           echo "$KEYSTORE_BASE64" | base64 -di > release.keystore
@@ -81,3 +93,4 @@ jobs:
       run: |
         rm -f composeApp/google-services.json
         rm -f release.keystore
+        rm -f composeApp/local.properties

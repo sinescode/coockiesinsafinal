@@ -14,6 +14,8 @@ kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
+        @Suppress("DEPRECATION")
+        publishLibraryVariants("release", "debug")
     }
     
     sourceSets {
@@ -22,10 +24,13 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.android)
             implementation(libs.androidx.datastore.preferences)
-            implementation(libs.firebase.bom)
+            
+            // Firebase - NO version needed, BOM manages it
+            implementation(platform(libs.firebase.bom))
             implementation(libs.firebase.messaging.ktx)
+            
             implementation(libs.kotlinx.coroutines.android)
-            implementation(libs.crypto)
+            implementation(libs.bouncycastle)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -42,19 +47,18 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {
-            implementation(libs.kotlin.test)
-        }
+            implementation(libs.kotlin.test)        }
     }
 }
 
 android {
     namespace = "com.turjaun.cookiesuploader"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.turjaun.cookiesuploader"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        minSdk = 24
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
@@ -63,10 +67,9 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "META-INF/DEPENDENCIES"
-            excludes += "META-INF/LICENSE"
-            excludes += "META-INF/LICENSE.txt"
-            excludes += "META-INF/NOTICE"
-            excludes += "META-INF/NOTICE.txt"
+            excludes += "META-INF/LICENSE*"
+            excludes += "META-INF/NOTICE*"
+            excludes += "META-INF/*.kotlin_module"
         }
     }
     
@@ -78,6 +81,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+        getByName("debug") {
+            isMinifyEnabled = false
+        }
     }
     
     compileOptions {
@@ -88,6 +94,12 @@ android {
     buildFeatures {
         compose = true
     }
+}
+
+// Add repositories block for dependency resolutionrepositories {
+    google()
+    mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 dependencies {
