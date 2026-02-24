@@ -1,3 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Cookies Insta</string>
+    <string name="app_name">Cookies Account Manager</string>
+    <string name="default_notification_channel_id">cookies_channel</string>
+    <string name="notification_channel_name">Account Notifications</string>
+    <string name="notification_channel_description">Notifications for account operations</string>
 </resources>
