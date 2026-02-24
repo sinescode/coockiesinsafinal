@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.turjaun.cookiesuploader.data.model.LogEntry
 import com.turjaun.cookiesuploader.ui.theme.DarkColorScheme
+import androidx.compose.foundation.layout.width 
 
 @Composable
 fun HomeTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {

@@ -42,15 +42,18 @@ import com.turjaun.cookiesuploader.ui.theme.DarkColorScheme
 @Composable
 fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    
+    // ✅ Collect StateFlows from ViewModel
     val webhookUrl by viewModel.webhookUrl.collectAsState()
     val jsonFilename by viewModel.jsonFilename.collectAsState()
-    val fcmToken by viewModel.fcmToken.collectAsState()
+    val fcmToken by viewModel.fcmToken.collectAsState() // ✅ Now works with StateFlow<String>
     
+    // ✅ Local mutable state for text fields
     var webhook by remember { mutableStateOf(webhookUrl) }
     var filename by remember { mutableStateOf(jsonFilename) }
     var showSavedMessage by remember { mutableStateOf(false) }
     
-    // Update local state when flow changes
+    // ✅ Sync local state when ViewModel flows update
     LaunchedEffect(webhookUrl) { webhook = webhookUrl }
     LaunchedEffect(jsonFilename) { filename = jsonFilename }
     
@@ -59,7 +62,9 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             .fillMaxSize()
             .padding(20.dp)
     ) {
+        // ─────────────────────────────────────────
         // Webhook URL Field
+        // ─────────────────────────────────────────
         OutlinedTextField(
             value = webhook,
             onValueChange = { webhook = it },
@@ -77,7 +82,9 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         
         Spacer(modifier = Modifier.height(20.dp))
         
+        // ─────────────────────────────────────────
         // JSON Filename Field
+        // ─────────────────────────────────────────
         OutlinedTextField(
             value = filename,
             onValueChange = { filename = it },
@@ -95,9 +102,11 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         
         Spacer(modifier = Modifier.height(30.dp))
         
+        // ─────────────────────────────────────────
         // FCM Token Display (Read-only with Copy)
+        // ─────────────────────────────────────────
         Text(
-            "FCM Token",
+            text = "FCM Token",
             color = Color(0xFF94a3b8),
             fontSize = 12.sp,
             modifier = Modifier.padding(bottom = 5.dp)
@@ -114,8 +123,9 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
                     .padding(end = 8.dp)
             ) {
                 Text(
-                    text = if (fcmToken.isNotEmpty()) fcmToken else "Generating token...",
-                    color = if (fcmToken.isNotEmpty()) Color(0xFF22c55e) else Color(0xFF64748b),
+                    // ✅ FIX: Use isNotBlank() to avoid overload ambiguity + handle empty state
+                    text = if (fcmToken.isNotBlank()) fcmToken else "Generating token...",
+                    color = if (fcmToken.isNotBlank()) Color(0xFF22c55e) else Color(0xFF64748b),
                     fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace,
                     maxLines = 2,
@@ -129,14 +139,16 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             // Copy Button
             Button(
                 onClick = {
-                    if (fcmToken.isNotEmpty()) {
+                    // ✅ FIX: Use isNotBlank() for String type safety
+                    if (fcmToken.isNotBlank() && !fcmToken.startsWith("Error")) {
                         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                         val clip = ClipData.newPlainText("FCM Token", fcmToken)
                         clipboard.setPrimaryClip(clip)
                         Toast.makeText(context, "Token copied!", Toast.LENGTH_SHORT).show()
                     }
                 },
-                enabled = fcmToken.isNotEmpty(),
+                // ✅ FIX: Enable only when token is valid
+                enabled = fcmToken.isNotBlank() && !fcmToken.startsWith("Error"),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF3b82f6),
                     disabledContainerColor = Color(0xFF1e293b)
@@ -144,7 +156,7 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             ) {
                 Icon(
                     imageVector = Icons.Filled.ContentCopy,
-                    contentDescription = "Copy",
+                    contentDescription = "Copy FCM Token",
                     tint = Color.White,
                     modifier = Modifier.padding(end = 4.dp)
                 )
@@ -154,7 +166,9 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
         
         Spacer(modifier = Modifier.height(30.dp))
         
+        // ─────────────────────────────────────────
         // Save Settings Button
+        // ─────────────────────────────────────────
         OutlinedButton(
             onClick = {
                 viewModel.saveSettings(webhook, filename)
@@ -168,12 +182,18 @@ fun SettingsTab(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             Text("Save Settings")
         }
         
+        // Show success message briefly
         if (showSavedMessage) {
             Text(
-                "Settings Saved",
+                text = "Settings Saved",
                 color = Color(0xFF22c55e),
                 modifier = Modifier.padding(top = 10.dp)
             )
+            // Auto-hide message after 2 seconds
+            LaunchedEffect(Unit) {
+                kotlinx.coroutines.delay(2000)
+                showSavedMessage = false
+            }
         }
     }
 }

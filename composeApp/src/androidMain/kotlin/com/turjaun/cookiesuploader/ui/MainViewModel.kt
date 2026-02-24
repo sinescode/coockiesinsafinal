@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.messaging.FirebaseMessaging
 import com.turjaun.cookiesuploader.data.AccountRepository
 import com.turjaun.cookiesuploader.data.model.Account
 import com.turjaun.cookiesuploader.data.model.LogEntry
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.io.File
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -39,6 +41,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     
     private val _isChecking = MutableStateFlow(false)
     val isChecking: StateFlow<Boolean> = _isChecking.asStateFlow()
+    
+    // ✅ NEW: FCM Token StateFlow
+    private val _fcmToken = MutableStateFlow<String>("")
+    val fcmToken: StateFlow<String> = _fcmToken.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -51,6 +57,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             repository.currentPassword.collect { 
                 _currentPassword.value = it
                 if (it.isEmpty()) generatePassword()
+            }
+        }
+        
+        // ✅ NEW: Fetch FCM Token on init
+        fetchFcmToken()
+    }
+    
+    // ✅ NEW: Helper function to fetch FCM token
+    private fun fetchFcmToken() {
+        viewModelScope.launch {
+            try {
+                val token = FirebaseMessaging.getInstance().token.await()
+                _fcmToken.value = token
+                repository.addLog("FCM", "Token fetched successfully")
+            } catch (e: Exception) {
+                _fcmToken.value = "Error: ${e.localizedMessage ?: "Unknown error"}"
+                repository.addLog("FCM", "Token fetch failed: ${e.localizedMessage}")
             }
         }
     }
@@ -69,6 +92,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         
         viewModelScope.launch {
             repository.addLog("System", "Password copied successfully")
+        }
+    }
+    
+    // ✅ NEW: Copy FCM Token function (optional helper)
+    fun copyFcmToken() {
+        val token = _fcmToken.value
+        if (token.isNotBlank() && !token.startsWith("Error")) {
+            val clipboard = getApplication<Application>().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("FCM Token", token)
+            clipboard.setPrimaryClip(clip)
+            
+            viewModelScope.launch {
+                repository.addLog("FCM", "Token copied to clipboard")
+            }
         }
     }
 
@@ -204,5 +241,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
             false
         }
+    }
+    
+    // ✅ Optional: Refresh FCM token manually (e.g., from Settings)
+    fun refreshFcmToken() {
+        _fcmToken.value = "Refreshing..."
+        fetchFcmToken()
     }
 }
