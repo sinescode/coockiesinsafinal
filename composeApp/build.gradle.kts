@@ -23,9 +23,12 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.androidx.datastore.preferences)
-            implementation(platform(libs.firebase.bom))
-            implementation(libs.firebase.messaging)
-            implementation(libs.firebase.analytics)
+            
+            // Firebase - use BOM correctly
+            implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+            implementation("com.google.firebase:firebase-messaging-ktx")
+            implementation("com.google.firebase:firebase-analytics-ktx")
+            
             implementation(libs.androidx.security.crypto)
             implementation(libs.androidx.work.runtime)
             implementation(libs.kotlinx.coroutines.android)
