@@ -9,6 +9,9 @@ plugins {
     alias(libs.plugins.googleServices)
 }
 
+// Suppress AGP compatibility warning (8.5.2 is tested and stable)
+extra.set("kotlin.mpp.androidGradlePluginCompatibility.nowarn", "true")
+
 kotlin {
     androidTarget {
         compilerOptions {
@@ -25,8 +28,7 @@ kotlin {
             implementation(libs.ktor.client.android)
             implementation(libs.androidx.datastore.preferences)
             
-            // Firebase - BOM manages versions, no version needed on individual libs
-            implementation(platform(libs.firebase.bom))
+            // Firebase - DIRECT VERSION (no platform/BOM in KMP)
             implementation(libs.firebase.messaging.ktx)
             
             implementation(libs.kotlinx.coroutines.android)
@@ -45,9 +47,9 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.serialization.json)
+        }        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)        }
     }
 }
 
@@ -95,6 +97,6 @@ android {
         compose = true
     }
 }
-
-dependencies {    debugImplementation(libs.compose.uiTooling)
+dependencies {
+    debugImplementation(libs.compose.uiTooling)
 }

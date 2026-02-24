@@ -1,6 +1,6 @@
 [versions]
-# Android & Kotlin
-agp = "8.7.3"
+# Android & Kotlin - COMPATIBLE VERSIONS
+agp = "8.5.2"
 android-compileSdk = "35"
 android-minSdk = "24"
 android-targetSdk = "35"
@@ -22,8 +22,11 @@ ktor = "3.0.1"
 kotlinx-serialization = "1.7.3"
 kotlinx-coroutines = "1.9.0"
 
-# Firebase & Security
+# Firebase - EXPLICIT VERSIONS (no BOM in KMP)
+firebase-messaging = "24.1.0"
 firebase-bom = "33.7.0"
+
+# Security
 bouncycastle = "1.79"
 
 # Testing
@@ -64,9 +67,8 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 # Coroutines
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 
-# Firebase (BOM manages versions)
-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
-firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx" }
+# Firebase - EXPLICIT VERSIONS (BOM not usable in KMP sourceSets)
+firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebase-messaging" }
 
 # Security
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
