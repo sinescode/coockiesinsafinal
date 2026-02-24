@@ -1,5 +1,4 @@
 plugins {
-    // this is necessary to avoid the plugins to be loaded multiple times
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
     alias(libs.plugins.composeMultiplatform) apply false
@@ -7,11 +6,4 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kotlinSerialization) apply false
     alias(libs.plugins.googleServices) apply false
-}
-
-// Root repositories for plugin resolution
-repositories {
-    google()
-    mavenCentral()
-    gradlePluginPortal()
 }

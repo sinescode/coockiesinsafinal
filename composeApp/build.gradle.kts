@@ -25,7 +25,7 @@ kotlin {
             implementation(libs.ktor.client.android)
             implementation(libs.androidx.datastore.preferences)
             
-            // Firebase - NO version needed, BOM manages it
+            // Firebase - BOM manages versions, no version needed on individual libs
             implementation(platform(libs.firebase.bom))
             implementation(libs.firebase.messaging.ktx)
             
@@ -96,12 +96,5 @@ android {
     }
 }
 
-// Add repositories block for dependency resolutionrepositories {
-    google()
-    mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-}
-
-dependencies {
-    debugImplementation(libs.compose.uiTooling)
+dependencies {    debugImplementation(libs.compose.uiTooling)
 }

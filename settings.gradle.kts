@@ -12,11 +12,16 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev") {
+            content { includeGroupByRegex("org\\.jetbrains\\.compose.*") }
+        }
     }
 }
 
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    
     repositories {
         google {
             mavenContent {
@@ -26,7 +31,9 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev") {
+            content { includeGroupByRegex("org\\.jetbrains\\.compose.*") }
+        }
     }
 }
 
